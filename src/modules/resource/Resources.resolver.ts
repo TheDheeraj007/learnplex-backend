@@ -31,6 +31,20 @@ export class ResourcesResolver {
     return resource
   }
 
+  @Query(() => Resource)
+  async resourceBySlug(
+    @Arg('resourceSlug') resourceSlug: string
+  ): Promise<Resource> {
+    const [resource] = await Resource.find({
+      where: { slug: resourceSlug },
+      take: 1,
+    })
+    if (!resource) {
+      throw new Error('Resource not found')
+    }
+    return resource
+  }
+
   @Query(() => [Resource])
   async resourcesByUsername(@Arg('username') username: string) {
     const [user] = await User.find({ where: { username } })
@@ -58,8 +72,13 @@ export class ResourcesResolver {
   }
 
   @Query(() => [Resource])
-  async allResources(): Promise<Resource[]> {
+  async allPublishedResources(): Promise<Resource[]> {
     return Resource.find({ published: true })
+  }
+
+  @Query(() => [Resource])
+  async allResources(): Promise<Resource[]> {
+    return Resource.find()
   }
 
   @Query(() => [Resource])
